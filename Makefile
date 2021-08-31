@@ -8,36 +8,32 @@ include ../crd.Makefile
 include ../gcloud.Makefile
 include ../var.Makefile
 
-# Production repo
-#REGISTRY ?= marketplace.gcr.io/google/redis-enterprise-operator
-# Artifact repo
-#REGISTRY := us-central1-docker.pkg.dev/proven-reality-226706/redis-market-place
 # Container repo
-REGISTRY := gcr.io/proven-reality-226706/redislabs
+REGISTRY := gcr.io/sam-playground-290106/tsb-operator
 
 $(info ---- REGISTRY = $(REGISTRY))
 
-CHART_NAME := redis-operator
+CHART_NAME := tsb-operator
 $(info ---- CHART_NAME = $(CHART_NAME))
 
-REDIS_TAG ?= 6.0.20-97
-$(info ---- REDIS_TAG = $(REDIS_TAG))
-
-OPERATOR_TAG ?= 6.0.20-12
+OPERATOR_TAG ?= 1.4.0-EA6
 $(info ---- OPERATOR_TAG = $(OPERATOR_TAG))
+
+POSTGRES_VERSION ?= 11.13.0
+ELASTIC_VERSION ?= 7.14.0
 
 # Deployer tag is used for displaying versions in partner portal.
 # This version only support major.minor so the Redis version major.minor.patch
 # is converted into more readable form of major.2 digit zero padded minor + patch
 # without the hyphen
-DEPLOYER_TAG ?= 6.002012
+DEPLOYER_TAG ?= 1.4
 $(info ---- DEPLOYER_TAG = $(DEPLOYER_TAG))
 
 # Tag the deployer image with modified version.
 APP_DEPLOYER_IMAGE := $(REGISTRY)/deployer:$(DEPLOYER_TAG)
 
-NAME ?= redis-enterprise-operator-1
-NAMESPACE ?= redis
+NAME ?= tsb-operator
+NAMESPACE ?= tsb
 
 APP_PARAMETERS ?= { \
   "APP_INSTANCE_NAME": "$(NAME)", \
@@ -46,16 +42,16 @@ APP_PARAMETERS ?= { \
 
 TESTER_IMAGE ?= $(REGISTRY)/tester:$(OPERATOR_TAG)
 
-app/build:: .build/redis-enterprise-operator/deployer \
-			.build/redis-enterprise-operator/primary \
-			.build/redis-enterprise-operator/usage-meter \
-            .build/redis-enterprise-operator/tester
+app/build:: .build/tsb-operator/deployer \
+			.build/tsb-operator/primary \
+			.build/tsb-operator/usage-meter \
+            .build/tsb-operator/tester
 
 
-.build/redis-enterprise-operator: | .build
+.build/tsb-operator: | .build
 	mkdir -p "$@"
 
-.build/redis-enterprise-operator/deployer: deployer/* \
+.build/tsb-operator/deployer: deployer/* \
 								  chart/**/* \
                                   schema.yaml \
                                   .build/var/APP_DEPLOYER_IMAGE \
@@ -63,7 +59,7 @@ app/build:: .build/redis-enterprise-operator/deployer \
                                   .build/var/REGISTRY \
                                   .build/var/OPERATOR_TAG \
 								  .build/var/CHART_NAME \
-                                  | .build/redis-enterprise-operator
+                                  | .build/tsb-operator
 	$(call print_target, $@)
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)" \
@@ -81,28 +77,28 @@ app/build:: .build/redis-enterprise-operator/deployer \
 # From the partner portal, primary image is queried using the same tag
 # as deployer image. When pulling the image from docker hub use
 # the redis native tag and push that image as primary image with deployer tag.
-.build/redis-enterprise-operator/primary: .build/var/REGISTRY \
+.build/tsb-operator/primary: .build/var/REGISTRY \
 										  .build/var/OPERATOR_TAG \
                                           .build/var/DEPLOYER_TAG \
-                                          | .build/redis-enterprise-operator
+                                          | .build/tsb-operator
 	$(call print_target, $@)
-	docker pull redislabs/operator:$(OPERATOR_TAG)
-	docker tag redislabs/operator:$(OPERATOR_TAG) "$(REGISTRY):$(OPERATOR_TAG)"
+	docker pull tsboperator-server:$(OPERATOR_TAG)
+	docker tag tsboperator-server:$(OPERATOR_TAG) "$(REGISTRY):$(OPERATOR_TAG)"
 	docker push "$(REGISTRY):$(OPERATOR_TAG)"
 	@touch "$@"
 
-.build/redis-enterprise-operator/usage-meter: usage-meter/**/* \
+.build/tsb-operator/usage-meter: usage-meter/**/* \
 										  .build/var/REGISTRY \
                                           .build/var/OPERATOR_TAG \
-                                | .build/redis-enterprise-operator
+                                | .build/tsb-operator
 	$(call print_target, $@)
 	cd usage-meter \
 	    && docker build --tag "$(REGISTRY)/usagemeter:$(OPERATOR_TAG)" .
 	docker push "$(REGISTRY)/usagemeter:$(OPERATOR_TAG)"
 	@touch "$@"
 
-.build/redis-enterprise-operator/tester: apptest/**/* \
-                                | .build/redis-enterprise-operator
+.build/tsb-operator/tester: apptest/**/* \
+                                | .build/tsb-operator
 	$(call print_target, $@)
 	cd apptest/tester \
 	    && docker build --tag "$(TESTER_IMAGE)" .
