@@ -1,0 +1,151 @@
+x-google-marketplace:
+  schemaVersion: v2
+  applicationApiVersion: v1beta1
+  publishedVersion: "$TAG"
+  publishedVersionMetadata:
+    releaseNote: >-
+      A regular update.
+    releaseTypes:
+      - Feature
+    recommended: false
+  images:
+    '':
+      properties:
+        operator.image.repository:
+          type: REPO_WITH_REGISTRY
+        operator.image.tag:
+          type: TAG
+    usagemeter:
+      properties:
+        usagemeter.image:
+          type: REPO_WITH_REGISTRY
+        usagemeter.tag:
+          type: TAG
+    bitnami:
+      properties:
+        bitnami.image:
+          type: REPO_WITH_REGISTRY
+        bitnami.tag:
+           type: TAG
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  operator.serviceAccountName:
+    type: string
+    title: Service account for operator
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Service account for operator
+        roles:
+        - type: ClusterRole
+          rulesType: CUSTOM
+          rules:
+            - apiGroups: ["apiextensions.k8s.io"]
+              resources: ["customresourcedefinitions"]
+              verbs: ["get"]
+        - type: Role
+          rulesType: CUSTOM
+          rules:         
+            - apiGroups: ["rbac.authorization.k8s.io", ""]
+              resources: ["roles", "serviceaccounts", "rolebindings"]
+              verbs: ["*"]
+            - apiGroups:
+                - app.redislabs.com
+              resources:
+                - "*"
+              verbs:
+                - "*"
+            - apiGroups: [""]
+              resources: ["secrets"]
+              verbs: ["*"]
+            - apiGroups: [""]
+              resources: ["endpoints"]
+              verbs: ["get", "list", "watch"]
+            - apiGroups: [""]
+              resources: ["events"]
+              verbs: ["create"]
+            - apiGroups: ["apps"]
+              resources: ["deployments", "statefulsets", "replicasets"]
+              verbs: ["*"]
+            - apiGroups: ["policy"]
+              resources: ["poddisruptionbudgets"]
+              verbs: ["create", "delete", "get"]
+            - apiGroups: [""]
+              resources: ["configmaps"]
+              verbs: ["create", "delete", "get" , "update", "list", "watch"]
+            - apiGroups: [""]
+              resources: ["persistentvolumeclaims"]
+              verbs: ["create", "delete", "get" , "update"]
+            # needed rbac rules for services controller
+            - apiGroups: [""]
+              resources: ["pods"]
+              verbs: ["get", "watch", "list", "update", "patch"]
+            - apiGroups: [""]
+              resources: ["services"]
+              verbs: ["get", "watch", "list", "update", "patch", "create", "delete"]
+            - apiGroups:
+                - route.openshift.io
+              resources: ["routes", "routes/custom-host"]
+              verbs: ["*"]
+            - apiGroups: ["extensions"]
+              resources: ["podsecuritypolicies"]
+              resourceNames:
+                - redis-enterprise-psp
+              verbs:
+                - use
+            - apiGroups: ["extensions"]
+              resources: ["ingresses"]
+              verbs: ["*"]            
+  CRJobServiceAccount:
+    type: string
+    title: Service account for custom resources
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Service account for custom resources
+        roles:
+        - type: ClusterRole
+          rulesType: CUSTOM
+          rules:
+            - apiGroups: ["app.redislabs.com", "apiextensions.k8s.io"]
+              resources: ["*"]
+              verbs: ["*"]
+  reportingSecret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
+  operator.storageClass:
+    title: Storage Class
+    type: string
+    description: Storage class
+    default: standard
+  CRDJobServiceAccount:
+    type: string
+    title: Service account for custom resource definitions
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Service account for custom resource definitions
+        roles:
+        - type: ClusterRole
+          rulesType: CUSTOM
+          rules:
+            - apiGroups: ["apiextensions.k8s.io"]
+              resources: ["customresourcedefinitions"]
+              verbs: ["get","list","create", "patch"]
+  deployerHelm.image:
+    type: string
+    x-google-marketplace:
+      type: DEPLOYER_IMAGE
+required:
+- name
+- namespace
+- operator.storageClass
+

@@ -11,7 +11,7 @@ spec:
   serviceAccountName: elastic
   containers:
   - name: hooktainer
-    image: bitnami/kubectl
+    image: {{ Values.bitnami.image }}:{{ Values.bitnami.tag }}
     imagePullPolicy: IfNotPresent
     command: ['sh', '-c', '--']
     args:

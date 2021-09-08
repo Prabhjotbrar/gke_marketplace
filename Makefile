@@ -16,11 +16,13 @@ $(info ---- REGISTRY = $(REGISTRY))
 CHART_NAME := tsb-operator
 $(info ---- CHART_NAME = $(CHART_NAME))
 
-OPERATOR_TAG ?= 1.4.0-EA6
+OPERATOR_TAG ?= 1.3.0
 $(info ---- OPERATOR_TAG = $(OPERATOR_TAG))
 
 POSTGRES_VERSION ?= 11.13.0
 ELASTIC_VERSION ?= 7.14.0
+ECK_OPERATOR_TAG ?= 1.7.1
+KUBECTL_TAG ?= 1.20.10
 
 # Deployer tag is used for displaying versions in partner portal.
 # This version only support major.minor so the Redis version major.minor.patch
@@ -44,7 +46,8 @@ TESTER_IMAGE ?= $(REGISTRY)/tester:$(OPERATOR_TAG)
 
 app/build:: .build/tsb-operator/deployer \
 			.build/tsb-operator/primary \
-			.build/tsb-operator/usage-meter \
+			.build/tsb-operator/eck-operator \
+			.build/tsb-operator/bitnami-kubectl \
             .build/tsb-operator/tester
 
 
@@ -72,6 +75,24 @@ app/build:: .build/tsb-operator/deployer \
 	docker push "$(APP_DEPLOYER_IMAGE)"
 	@touch "$@"
 
+.build/tsb-operator/eck-operator: .build/var/REGISTRY \
+										  .build/var/ECK_OPERATOR_TAG \
+                                          | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull docker.elastic.co/eck/eck-operator:$(ECK_OPERATOR_TAG)
+	docker tag docker.elastic.co/eck/eck-operator:$(ECK_OPERATOR_TAG) "$(REGISTRY)/eck-operator:$(ECK_OPERATOR_TAG)"
+	docker push "$(REGISTRY)/eck-operator:$(ECK_OPERATOR_TAG)"
+	@touch "$@"
+
+.build/tsb-operator/bitnami-kubectl: .build/var/REGISTRY \
+										  .build/var/KUBECTL_TAG \
+                                          | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull bitnami/kubectl:$(KUBECTL_TAG)
+	docker tag bitnami/kubectl:$(KUBECTL_TAG) "$(REGISTRY)/kubectl:$(KUBECTL_TAG)"
+	docker push "$(REGISTRY)/kubectl:$(KUBECTL_TAG)"
+	@touch "$@"
+
 # Operator image is the primary image for Redis Enterprise.
 # Label the primary image with the same tag as deployer image.
 # From the partner portal, primary image is queried using the same tag
@@ -79,22 +100,11 @@ app/build:: .build/tsb-operator/deployer \
 # the redis native tag and push that image as primary image with deployer tag.
 .build/tsb-operator/primary: .build/var/REGISTRY \
 										  .build/var/OPERATOR_TAG \
-                                          .build/var/DEPLOYER_TAG \
                                           | .build/tsb-operator
 	$(call print_target, $@)
-	docker pull tsboperator-server:$(OPERATOR_TAG)
-	docker tag tsboperator-server:$(OPERATOR_TAG) "$(REGISTRY):$(OPERATOR_TAG)"
+	docker pull gcr.io/gke-istio-test-psb/tsboperator-server:$(OPERATOR_TAG)
+	docker tag gcr.io/gke-istio-test-psb/tsboperator-server:$(OPERATOR_TAG) "$(REGISTRY):$(OPERATOR_TAG)"
 	docker push "$(REGISTRY):$(OPERATOR_TAG)"
-	@touch "$@"
-
-.build/tsb-operator/usage-meter: usage-meter/**/* \
-										  .build/var/REGISTRY \
-                                          .build/var/OPERATOR_TAG \
-                                | .build/tsb-operator
-	$(call print_target, $@)
-	cd usage-meter \
-	    && docker build --tag "$(REGISTRY)/usagemeter:$(OPERATOR_TAG)" .
-	docker push "$(REGISTRY)/usagemeter:$(OPERATOR_TAG)"
 	@touch "$@"
 
 .build/tsb-operator/tester: apptest/**/* \
