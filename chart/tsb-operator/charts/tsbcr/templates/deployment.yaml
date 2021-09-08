@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    platform.tsb.tetrate.io/application: tsb-operator-managementplane
+    platform.tsb.tetrate.io/component: tsb-operator
+    platform.tsb.tetrate.io/plane: management
+  name: tsb-operator-management-plane
+  namespace: 'tsb'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: tsb-operator
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
+        name: tsb-operator
+    spec:
+      containers:
+      - args:
+        - management-plane
+        - --deployment-name
+        - tsb-operator-management-plane
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: OPERATOR_NAME
+          value: tsb-operator
+        image: '{{ .Values.image.registry }}/tsboperator-server:{{ .Values.image.tag }}'
+        imagePullPolicy: IfNotPresent
+        name: tsb-operator
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      serviceAccountName: tsb-operator-management-plane
+      volumes:
+      - emptyDir: {}
+        name: tmp

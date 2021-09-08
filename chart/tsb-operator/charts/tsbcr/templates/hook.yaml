@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: posthookcontainer
+  namespace: tsb
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "-5"
+#    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  serviceAccountName: tsb-operator-management-plane
+  containers:
+  - name: hooktainer
+    image: gcr.io/gke-istio-test-psb/tctl:v4
+    imagePullPolicy: IfNotPresent
+    command: ['sh', '-c', '--']
+
+    
+    args:
+    - | 
+        sleep 20;
+        export PG_PASS=$(kubectl get secret -n default tsb-user.acid-minimal-cluster.credentials -o json |jq .data.password | tr -d '"' | base64 -d)
+        tctl install manifest management-plane-secrets --tsb-admin-password admin --tsb-server-certificate "$(cat artifacts/dummy.cert.pem)" --tsb-server-key "$(cat artifacts/dummy.key.pem)" --postgres-username tsb_user --postgres-password $PG_PASS  --elastic-username elastic --elastic-password $ELASTIC_PASS --allow-defaults --elastic-ca-certificate "$(cat artifacts/es-ca-cert.pem)" --xcp-certs
+        cat <<EOF | kubectl apply -f -
+        apiVersion: install.tetrate.io/v1alpha1
+        kind: ManagementPlane
+        metadata:
+          name: managementplane
+          namespace: tsb
+        spec:
+          dataStore:
+            postgres:
+              connectionLifetime: 8500s
+              host: acid-cluster.pgsql.svc
+              name: my_tsb
+              port: 5432
+          hub: {{ .Values.image.registry }}
+          organization: tetrate
+          identityProvider:
+            demoLdap:
+              disableTLS: true
+              host: ldap
+              iam:
+                matchDN: cn=%s,ou=People,dc=tetrate,dc=io
+                matchFilter: (&(objectClass=person)(uid=%s))
+              port: 389
+              search:
+                baseDN: dc=tetrate,dc=io
+                recursive: true
+              sync:
+                groupsFilter: (objectClass=groupOfUniqueNames)
+                membershipAttribute: uniqueMember
+                usersFilter: (objectClass=person)
+          telemetryStore:
+            elastic:
+              host: elasticsearch-es-http.elastic.svc
+              port: 9200
+              selfSigned: true
+              version: 7
+          tenant: tetrate
+          tokenIssuer:
+            jwt:
+              expiration: 3600s
+              issuers:
+              - name: https://demo.tetrate.io
+                signingKey: tls.key
+              refreshExpiration: 2592000s
+              tokenPruneInterval: 3600s
+        EOF
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0

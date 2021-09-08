@@ -1,0 +1,11 @@
+apiVersion: v2
+name: tsbcr
+description: A Helm chart for Kubernetes
+version: 1.3.0
+type: application
+
+
+appVersion: "1.16.0"
+keywords:
+- tsbcr
+- xontrol
