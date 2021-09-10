@@ -12,6 +12,10 @@ image:
   pullPolicy: "IfNotPresent"
 
 
+env:
+  cpcluster:
+  mpcluster:
+
 # imagePullSecrets: []
 # nameOverride: ""
 # fullnameOverride: ""

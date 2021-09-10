@@ -11,16 +11,16 @@ spec:
   serviceAccountName: tsb-operator-management-plane
   containers:
   - name: hooktainer
-    image: gcr.io/gke-istio-test-psb/tctl:v4
+    image: gcr.io/gke-istio-test-psb/tctl:v8
     imagePullPolicy: IfNotPresent
-    command: ['sh', '-c', '--']
-
-    
+    command: ['sh', '-c', '--']    
     args:
     - | 
         sleep 20;
-        export PG_PASS=$(kubectl get secret -n default tsb-user.acid-minimal-cluster.credentials -o json |jq .data.password | tr -d '"' | base64 -d)
-        tctl install manifest management-plane-secrets --tsb-admin-password admin --tsb-server-certificate "$(cat artifacts/dummy.cert.pem)" --tsb-server-key "$(cat artifacts/dummy.key.pem)" --postgres-username tsb_user --postgres-password $PG_PASS  --elastic-username elastic --elastic-password $ELASTIC_PASS --allow-defaults --elastic-ca-certificate "$(cat artifacts/es-ca-cert.pem)" --xcp-certs
+        kubectl get secret -n elastic elasticsearch-es-http-certs-public -o json -o=jsonpath="{.data.ca\.crt}" | base64 -d > /tmp/es.pem
+        export ELASTIC_PASS=$(kubectl get secret -n elastic elasticsearch-es-elastic-user -o json |jq .data.elastic | tr -d '"' | base64 -d) 
+        export PG_PASS=$(kubectl get secret -n pgsql tsb-user.acid-cluster.credentials.postgresql.acid.zalan.do -o json |jq .data.password | tr -d '"' | base64 -d)
+        tctl install manifest management-plane-secrets --tsb-admin-password admin --tsb-server-certificate "$(cat /tmp/dummy.cert.pem)" --tsb-server-key "$(cat /tmp/dummy.key.pem)" --postgres-username tsb_user --postgres-password $PG_PASS  --elastic-username elastic --elastic-password $ELASTIC_PASS --allow-defaults --elastic-ca-certificate "$(cat /tmp/es.pem)" --xcp-certs | kubectl apply -f -
         cat <<EOF | kubectl apply -f -
         apiVersion: install.tetrate.io/v1alpha1
         kind: ManagementPlane
@@ -67,5 +67,8 @@ spec:
               refreshExpiration: 2592000s
               tokenPruneInterval: 3600s
         EOF
+        sleep 30
+        until nslookup oap.tsb.svc.cluster.local;do echo waiting for oap to come up;sleep 5;done
+        kubectl create job -n tsb teamsync-bootstrap --from=cronjob/teamsync
   restartPolicy: Never
   terminationGracePeriodSeconds: 0
