@@ -21,6 +21,12 @@ x-google-marketplace:
           type: REPO_WITH_REGISTRY
         usagemeter.tag:
           type: TAG
+    eckopertator:
+      properties:
+        eckoperator.image:
+          type: REPO_WITH_REGISTRY
+        eckoperator.tag:
+           type: TAG
     bitnami:
       properties:
         bitnami.image:
@@ -63,7 +69,7 @@ properties:
               resources: ["roles", "serviceaccounts", "rolebindings"]
               verbs: ["*"]
             - apiGroups:
-                - app.redislabs.com
+                - "*"
               resources:
                 - "*"
               verbs:
@@ -110,7 +116,7 @@ properties:
         - type: ClusterRole
           rulesType: CUSTOM
           rules:
-            - apiGroups: ["app.redislabs.com", "apiextensions.k8s.io"]
+            - apiGroups: ["*", "apiextensions.k8s.io"]
               resources: ["*"]
               verbs: ["*"]
   reportingSecret:
