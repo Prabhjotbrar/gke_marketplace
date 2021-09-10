@@ -1,1 +1,1 @@
-gcr.io/sam-playground-290106/tsb-operator/deployer:1.4
+gcr.io/gke-istio-test-psb/tsb-operator/deployer:1.4

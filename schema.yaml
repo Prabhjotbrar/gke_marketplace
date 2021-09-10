@@ -27,6 +27,12 @@ x-google-marketplace:
           type: REPO_WITH_REGISTRY
         bitnami.tag:
            type: TAG
+    tctl:
+      properties:
+        tctl.image:
+          type: REPO_WITH_REGISTRY
+        tctl.tag:
+           type: TAG
 properties:
   name:
     type: string
@@ -90,16 +96,6 @@ properties:
             - apiGroups: [""]
               resources: ["services"]
               verbs: ["get", "watch", "list", "update", "patch", "create", "delete"]
-            - apiGroups:
-                - route.openshift.io
-              resources: ["routes", "routes/custom-host"]
-              verbs: ["*"]
-            - apiGroups: ["extensions"]
-              resources: ["podsecuritypolicies"]
-              resourceNames:
-                - redis-enterprise-psp
-              verbs:
-                - use
             - apiGroups: ["extensions"]
               resources: ["ingresses"]
               verbs: ["*"]            
