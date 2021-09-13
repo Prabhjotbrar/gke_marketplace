@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: posthookcontainercp
+  namespace: tsb
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "-5"
+#    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  serviceAccountName: tsb-operator-management-plane
+  containers:
+  - name: phooktainer
+    image: gcr.io/gke-istio-test-psb/tctl:v8
+    imagePullPolicy: IfNotPresent
+    env:          
+    {{- range $key, $val := .Values.env }}
+      - name: {{ $key }}
+        value: {{ $val | quote }}
+    {{- end }}
+    command: ['sh', '-c', '--']
+    args:
+    - |
+        sleep 20;
+        mpaddress=$(kubectl get svc -n tsb envoy -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        cat <<EOF | kubectl apply -f -
+        apiVersion: install.tetrate.io/v1alpha1
+        kind: ControlPlane
+        metadata:
+          name: controlplane
+          namespace: istio-system
+        spec:
+          hub: gcr.io/gke-istio-test-psb
+          telemetryStore:
+            elastic:
+              host: elasticsearch-es-http.elastic.svc
+              port: 9200
+              version: 7
+              selfSigned: true
+          managementPlane:
+            host: $mpaddress
+            port: 8443
+            clusterName: $cpcluster
+          meshExpansion: {}
+        EOF
+        sleep 30
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
