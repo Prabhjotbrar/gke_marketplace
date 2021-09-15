@@ -39,6 +39,55 @@ x-google-marketplace:
           type: REPO_WITH_REGISTRY
         tctl.tag:
            type: TAG
+    registry.opensource.zalan.do/acid/postgres-operator:
+      properties:
+        registry.opensource.zalan.do/acid/postgres-operator.image:
+          type: REPO_WITH_REGISTRY
+        registry.opensource.zalan.do/acid/postgres-operator.tag:
+           type: TAG
+    registry.opensource.zalan.do/acid/spilo-13:
+      properties:
+        registry.opensource.zalan.do/acid/spilo-13.image:
+          type: REPO_WITH_REGISTRY
+        registry.opensource.zalan.do/acid/spilo-13.tag:
+           type: TAG
+    bitnami/kubectl:
+      properties:
+        bitnami/kubectl.image:
+          type: REPO_WITH_REGISTRY
+        bitnami/kubectl.tag:
+           type: TAG
+    docker.elastic.co/elasticsearch/elasticsearch:
+      properties:
+        docker.elastic.co/elasticsearch/elasticsearch.image:
+          type: REPO_WITH_REGISTRY
+        docker.elastic.co/elasticsearch/elasticsearch.tag:
+           type: TAG
+    docker.io/bitnami/kubectl:
+      properties:
+        docker.io/bitnami/kubectl.image:
+          type: REPO_WITH_REGISTRY
+        docker.io/bitnami/kubectl.tag:
+           type: TAG
+    quay.io/jetstack/cert-manager-cainjector:
+      properties:
+        quay.io/jetstack/cert-manager-cainjector.image:
+          type: REPO_WITH_REGISTRY
+        quay.io/jetstack/cert-manager-cainjector.tag:
+           type: TAG
+    quay.io/jetstack/cert-manager-controller:
+      properties:
+        quay.io/jetstack/cert-manager-controller.image:
+          type: REPO_WITH_REGISTRY
+        quay.io/jetstack/cert-manager-controller.tag:
+           type: TAG
+    quay.io/jetstack/cert-manager-webhook:
+      properties:
+        quay.io/jetstack/cert-manager-webhook.image:
+          type: REPO_WITH_REGISTRY
+        quay.io/jetstack/cert-manager-webhook.tag:
+           type: TAG
+
 properties:
   name:
     type: string

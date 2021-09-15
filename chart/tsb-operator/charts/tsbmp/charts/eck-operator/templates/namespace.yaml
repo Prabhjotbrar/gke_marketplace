@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elastic
+spec: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elastic-system
+spec: {}

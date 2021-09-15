@@ -17,6 +17,8 @@ spec:
     args:
     - | 
         sleep 20;
+        until curl -vk https://elasticsearch-es-http.elastic:9200; do echo waiting for es to come up && sleep 10;done
+        sleep 10;
         kubectl get secret -n elastic elasticsearch-es-http-certs-public -o json -o=jsonpath="{.data.ca\.crt}" | base64 -d > /tmp/es.pem
         export ELASTIC_PASS=$(kubectl get secret -n elastic elasticsearch-es-elastic-user -o json |jq .data.elastic | tr -d '"' | base64 -d) 
         export PG_PASS=$(kubectl get secret -n pgsql tsb-user.acid-cluster.credentials.postgresql.acid.zalan.do -o json |jq .data.password | tr -d '"' | base64 -d)
@@ -68,7 +70,7 @@ spec:
               tokenPruneInterval: 3600s
         EOF
         sleep 30
-        until nslookup oap.tsb.svc.cluster.local;do echo waiting for oap to come up;sleep 5;done
+        until nslookup oap.tsb.svc.cluster.local;do echo waiting for oap to come up && sleep 5;done
         kubectl create job -n tsb teamsync-bootstrap --from=cronjob/teamsync
   restartPolicy: Never
   terminationGracePeriodSeconds: 0

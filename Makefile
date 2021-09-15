@@ -24,6 +24,16 @@ ELASTIC_VERSION ?= 7.14.0
 ECK_OPERATOR_TAG ?= 1.7.1
 KUBECTL_TAG ?= 1.20.10
 TCTL_TAG ?= v8
+PGO_TAG ?= v1.6.3
+PGS_TAG ?= 2.0-p7
+ES_TAG ?= 7.5.2
+CERT_TAG ?= v1.5.3
+
+
+
+
+
+
 
 # Deployer tag is used for displaying versions in partner portal.
 # This version only support major.minor so the Redis version major.minor.patch
@@ -50,7 +60,14 @@ app/build:: .build/tsb-operator/deployer \
             .build/tsb-operator/eck-operator \
             .build/tsb-operator/bitnami-kubectl \
             .build/tsb-operator/tctl \
-            .build/tsb-operator/tester
+            .build/tsb-operator/tester \
+			.build/tsb-operator/registry.opensource.zalan.do/acid/postgres-operator \
+			.build/tsb-operator/registry.opensource.zalan.do/acid/spilo-13 \
+			.build/tsb-operator/docker.elastic.co/elasticsearch/elasticsearch \
+			.build/tsb-operator/docker.io/bitnami/kubectl \
+			.build/tsb-operator/quay.io/jetstack/cert-manager-cainjector \
+			.build/tsb-operator/quay.io/jetstack/cert-manager-controller \
+			.build/tsb-operator/quay.io/jetstack/cert-manager-webhook
 
 
 .build/tsb-operator: | .build
@@ -126,4 +143,69 @@ app/build:: .build/tsb-operator/deployer \
 	    && docker build --tag "$(TESTER_IMAGE)" .
 	docker push "$(TESTER_IMAGE)"
 	@touch "$@"
+
+.build/tsb-operator/tctl: .build/var/REGISTRY \
+  				     .build/var/TCTL_TAG \
+                                     | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull gcr.io/gke-istio-test-psb/tctl:$(TCTL_TAG)
+	docker tag gcr.io/gke-istio-test-psb/tctl:$(TCTL_TAG) "$(REGISTRY)/tctl:$(TCTL_TAG)"
+	docker push "$(REGISTRY)/tctl:$(TCTL_TAG)"
+	@touch "$@"
+
+.build/tsb-operator/postgres-operator: .build/var/REGISTRY \
+  				     .build/var/PGO_TAG \
+                                     | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull registry.opensource.zalan.do/acid/postgres-operator:$(PGO_TAG)
+	docker tag registry.opensource.zalan.do/acid/postgres-operator:$(PGO_TAG) "$(REGISTRY)/postgres-operator:$(PGO_TAG)"
+	docker push "$(REGISTRY)/postgres-operator:$(PGO_TAG)"
+	@touch "$@"
+
+.build/tsb-operator/acid/spilo-13: .build/var/REGISTRY \
+  				     .build/var/PGS_TAG \
+                                     | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull registry.opensource.zalan.do/acid/spilo-13:$(PGS_TAG)
+	docker tag registry.opensource.zalan.do/acid/spilo-13:$(PGS_TAG) "$(REGISTRY)/spilo-13:$(PGS_TAG)"
+	docker push "$(REGISTRY)/spilo-13:$(PGS_TAG)"
+	@touch "$@"
+
+.build/tsb-operator/elasticsearch: .build/var/REGISTRY \
+  				     .build/var/ES_TAG \
+                                     | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull docker.elastic.co/elasticsearch/elasticsearch:$(ES_TAG)
+	docker tag docker.elastic.co/elasticsearch/elasticsearch:$(ES_TAG) "$(REGISTRY)/elasticsearch:$(ES_TAG)"
+	docker push "$(REGISTRY)/tctl:$(ES_TAG)"
+	@touch "$@"
+
+
+.build/tsb-operator/cert-manager-cainjector: .build/var/REGISTRY \
+  				     .build/var/CERT_TAG \
+                                     | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull quay.io/jetstack/cert-manager-cainjector:$(CERT_TAG)
+	docker tag quay.io/jetstack/cert-manager-cainjector:$(CERT_TAG) "$(REGISTRY)/cert-manager-cainjector:$(CERT_TAG)"
+	docker push "$(REGISTRY)/cert-manager-cainjector:$(CERT_TAG)"
+	@touch "$@"
+
+.build/tsb-operator/cert-manager-controller: .build/var/REGISTRY \
+  				     .build/var/CERT_TAG \
+                                     | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull quay.io/jetstack/cert-manager-controller:$(CERT_TAG)
+	docker tag quay.io/jetstack/cert-manager-controller:$(CERT_TAG) "$(REGISTRY)/cert-manager-controller:$(CERT_TAG)"
+	docker push "$(REGISTRY)/cert-manager-controller:$(CERT_TAG)"
+	@touch "$@"
+
+.build/tsb-operator/cert-manager-webhook: .build/var/REGISTRY \
+  				     .build/var/CERT_TAG \
+                                     | .build/tsb-operator
+	$(call print_target, $@)
+	docker pull quay.io/jetstack/cert-manager-webhook:$(CERT_TAG)
+	docker tag quay.io/jetstack/cert-manager-webhook:$(CERT_TAG) "$(REGISTRY)/webhook:$(CERT_TAG)"
+	docker push "$(REGISTRY)/cert-manager-webhook:$(CERT_TAG)"
+	@touch "$@"
+
 

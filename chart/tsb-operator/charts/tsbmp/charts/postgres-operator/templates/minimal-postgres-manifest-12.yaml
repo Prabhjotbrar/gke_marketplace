@@ -1,0 +1,21 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: acid-cluster
+  namespace: pgsql
+spec:
+  teamId: "acid"
+  volume:
+    size: 20Gi
+  numberOfInstances: 2
+  users:
+    zalando: 
+    - superuser
+    - createdb
+    tsb_user: []  
+  databases:
+    my_tsb: tsb_user 
+  preparedDatabases:
+    bar: {}
+  postgresql:
+    version: "12"
