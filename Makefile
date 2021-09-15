@@ -30,9 +30,7 @@ ES_TAG ?= 7.5.2
 CERT_TAG ?= v1.5.3
 
 # Deployer tag is used for displaying versions in partner portal.
-# This version only support major.minor so the Redis version major.minor.patch
-# is converted into more readable form of major.2 digit zero padded minor + patch
-# without the hyphen
+# This version only support major.minor 
 DEPLOYER_TAG ?= 1.4
 $(info ---- DEPLOYER_TAG = $(DEPLOYER_TAG))
 
@@ -114,11 +112,11 @@ app/build:: .build/tsb-operator/deployer \
 	docker push "$(REGISTRY)/tctl:$(TCTL_TAG)"
 	@touch "$@"
 
-# Operator image is the primary image for Redis Enterprise.
+# Operator image is the primary image for Tetrate.
 # Label the primary image with the same tag as deployer image.
 # From the partner portal, primary image is queried using the same tag
 # as deployer image. When pulling the image from docker hub use
-# the redis native tag and push that image as primary image with deployer tag.
+# the tetrate native tag and push that image as primary image with deployer tag.
 
 .build/tsb-operator/primary: .build/var/REGISTRY \
  			    .build/var/OPERATOR_TAG \

@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-mpdev verify --deployer=gcr.io/proven-reality-226706/redislabs/deployer:6.002012 | tee verify.log
+mpdev verify --deployer=gcr.io/gke-istio-test-psb/tsb-operator/deployer:1.4 | tee verify.log
