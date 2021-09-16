@@ -1,0 +1,33 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    platform.tsb.tetrate.io/application: tsb-operator-managementplane
+    platform.tsb.tetrate.io/component: tsb-operator
+    platform.tsb.tetrate.io/plane: management
+  name: tsb-operator-management-plane
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tsb-operator-management-plane
+subjects:
+- kind: ServiceAccount
+  name: tsb-operator-management-plane
+  namespace: 'tsb'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    platform.tsb.tetrate.io/application: tsb-operator-managementplane
+    platform.tsb.tetrate.io/component: tsb-operator
+    platform.tsb.tetrate.io/plane: management
+  name: tsb-operator-management-plane1
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tsb-operator-management-plane1
+subjects:
+- kind: ServiceAccount
+  name: tsb-operator-management-plane
+  namespace: 'tsb'

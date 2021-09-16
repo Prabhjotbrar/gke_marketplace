@@ -1,0 +1,186 @@
+{
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+        "annotations": {
+            "meta.helm.sh/release-name": "tsbcp",
+            "meta.helm.sh/release-namespace": "tsb",
+            "tsb.tetrate.io/contentHash": "d75e9f875ca08fa9",
+            "xcp.tetrate.io/contentHash": "12ebc1a89cf3e09e"
+        },
+        "creationTimestamp": "2021-09-16T02:29:05Z",
+        "deletionTimestamp": "2021-09-16T02:37:22Z",
+        "labels": {
+            "app.kubernetes.io/managed-by": "Helm",
+            "istio-injection": "disabled",
+            "istio-operator-managed": "Reconcile",
+            "platform.tsb.tetrate.io/component": "base",
+            "platform.tsb.tetrate.io/plane": "control",
+            "xcp-edge-validation": "enabled"
+        },
+        "managedFields": [
+            {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            ".": {},
+                            "f:meta.helm.sh/release-name": {},
+                            "f:meta.helm.sh/release-namespace": {}
+                        },
+                        "f:labels": {
+                            ".": {},
+                            "f:app.kubernetes.io/managed-by": {}
+                        }
+                    },
+                    "f:status": {
+                        "f:phase": {}
+                    }
+                },
+                "manager": "Go-http-client",
+                "operation": "Update",
+                "time": "2021-09-16T02:29:05Z"
+            },
+            {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            "f:tsb.tetrate.io/contentHash": {}
+                        },
+                        "f:labels": {
+                            "f:istio-injection": {},
+                            "f:istio-operator-managed": {},
+                            "f:platform.tsb.tetrate.io/component": {},
+                            "f:platform.tsb.tetrate.io/plane": {}
+                        }
+                    }
+                },
+                "manager": "tsboperator-server",
+                "operation": "Update",
+                "time": "2021-09-16T02:32:55Z"
+            },
+            {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            "f:xcp.tetrate.io/contentHash": {}
+                        },
+                        "f:labels": {
+                            "f:xcp-edge-validation": {}
+                        }
+                    }
+                },
+                "manager": "operator",
+                "operation": "Update",
+                "time": "2021-09-16T02:33:14Z"
+            },
+            {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:status": {
+                        "f:conditions": {
+                            ".": {},
+                            "k:{\"type\":\"NamespaceContentRemaining\"}": {
+                                ".": {},
+                                "f:lastTransitionTime": {},
+                                "f:message": {},
+                                "f:reason": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"NamespaceDeletionContentFailure\"}": {
+                                ".": {},
+                                "f:lastTransitionTime": {},
+                                "f:message": {},
+                                "f:reason": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"NamespaceDeletionDiscoveryFailure\"}": {
+                                ".": {},
+                                "f:lastTransitionTime": {},
+                                "f:message": {},
+                                "f:reason": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"NamespaceDeletionGroupVersionParsingFailure\"}": {
+                                ".": {},
+                                "f:lastTransitionTime": {},
+                                "f:message": {},
+                                "f:reason": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"NamespaceFinalizersRemaining\"}": {
+                                ".": {},
+                                "f:lastTransitionTime": {},
+                                "f:message": {},
+                                "f:reason": {},
+                                "f:status": {},
+                                "f:type": {}
+                            }
+                        }
+                    }
+                },
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "time": "2021-09-16T02:37:52Z"
+            }
+        ],
+        "name": "istio-system",
+        "resourceVersion": "51613",
+        "uid": "a720c02a-67e2-4029-9719-7c80074ddfd3"
+    },
+    "spec": {
+        "finalizers": [
+           
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastTransitionTime": "2021-09-16T02:37:52Z",
+                "message": "All resources successfully discovered",
+                "reason": "ResourcesDiscovered",
+                "status": "False",
+                "type": "NamespaceDeletionDiscoveryFailure"
+            },
+            {
+                "lastTransitionTime": "2021-09-16T02:37:52Z",
+                "message": "All legacy kube types successfully parsed",
+                "reason": "ParsedGroupVersions",
+                "status": "False",
+                "type": "NamespaceDeletionGroupVersionParsingFailure"
+            },
+            {
+                "lastTransitionTime": "2021-09-16T02:37:52Z",
+                "message": "All content successfully deleted, may be waiting on finalization",
+                "reason": "ContentDeleted",
+                "status": "False",
+                "type": "NamespaceDeletionContentFailure"
+            },
+            {
+                "lastTransitionTime": "2021-09-16T02:37:52Z",
+                "message": "Some resources are remaining: istiooperators.install.istio.io has 1 resource instances",
+                "reason": "SomeResourcesRemain",
+                "status": "True",
+                "type": "NamespaceContentRemaining"
+            },
+            {
+                "lastTransitionTime": "2021-09-16T02:37:52Z",
+                "message": "Some content in the namespace has finalizers remaining: istio-finalizer.install.istio.io in 1 resource instances",
+                "reason": "SomeFinalizersRemain",
+                "status": "True",
+                "type": "NamespaceFinalizersRemaining"
+            }
+        ],
+        "phase": "Terminating"
+    }
+}

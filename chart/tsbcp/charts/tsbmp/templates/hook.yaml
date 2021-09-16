@@ -13,6 +13,11 @@ spec:
   - name: hooktainer
     image: gcr.io/gke-istio-test-psb/tctl:v8
     imagePullPolicy: IfNotPresent
+    env:
+    {{- range $key, $val := .Values.env }}
+      - name: {{ $key }}
+        value: {{ $val | quote }}
+    {{- end }}
     command: ['sh', '-c', '--']    
     args:
     - | 
@@ -70,7 +75,29 @@ spec:
               tokenPruneInterval: 3600s
         EOF
         sleep 30
-        until nslookup oap.tsb.svc.cluster.local;do echo waiting for oap to come up && sleep 5;done
+        until nslookup oap.tsb.svc.cluster.local;do echo waiting for oap to come up && sleeip 10;done
         kubectl create job -n tsb teamsync-bootstrap --from=cronjob/teamsync
+        sleep 30;
+        mpaddress=$(kubectl get svc -n tsb envoy -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        tctl config clusters set $mpcluster --bridge-address $mpaddress:8443
+        tctl config profiles set $mpcluster --cluster $mpcluster
+        tctl config profiles  set-current $mpcluster
+        TCTL_LOGIN_ORG=tetrate TCTL_LOGIN_TENANT=tetrate TCTL_LOGIN_USERNAME=admin TCTL_LOGIN_PASSWORD=$password tctl login
+        cat <<EOF | tctl apply -f -
+        apiVersion: api.tsb.tetrate.io/v2
+        kind: Cluster
+        metadata:
+          name: $cpcluster
+          organization: tetrate
+        spec:
+          tier1Cluster: false
+          tokenTtl: 31536000s # 1y
+        EOF
+        sleep 5
+        kubectl get secret -n elastic elasticsearch-es-http-certs-public -o json -o=jsonpath="{.data.ca\.crt}" | base64 -d > /tmp/es.pem
+        export ELASTIC_PASS=$(kubectl get secret -n elastic elasticsearch-es-elastic-user -o json |jq .data.elastic | tr -d '"' | base64 -d)
+        sleep 2;
+        tctl install manifest control-plane-secrets  --allow-defaults  --elastic-password $ELASTIC_PASS --elastic-username elastic  --elastic-ca-certificate "$(cat /tmp/es.pem)" --cluster $cpcluster --xcp-certs "$(tctl install cluster-certs --cluster $cpcluster)" | kubectl apply -f -
+        sleep 10
   restartPolicy: Never
   terminationGracePeriodSeconds: 0

@@ -13,8 +13,10 @@ image:
 
 
 env:
-  cpcluster:
-  mpcluster:
+  cpcluster: cp-h
+  mpcluster: mp-h
+  password: admin
+
 
 # imagePullSecrets: []
 # nameOverride: ""

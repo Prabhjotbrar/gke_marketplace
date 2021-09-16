@@ -22,7 +22,10 @@ spec:
     args:
     - |
         sleep 20;
+        until curl -vk curl -vk https://envoy.tsb.svc.cluster.local:8443; do echo waiting for envoy to come up && sleep 10;done
+        sleep 10
         mpaddress=$(kubectl get svc -n tsb envoy -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        sleep 5
         cat <<EOF | kubectl apply -f -
         apiVersion: install.tetrate.io/v1alpha1
         kind: ControlPlane
