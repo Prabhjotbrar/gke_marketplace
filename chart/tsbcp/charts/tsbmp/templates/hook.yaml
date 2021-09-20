@@ -4,8 +4,8 @@ metadata:
   name: posthookcontainer
   namespace: tsb
   annotations:
-    "helm.sh/hook": "post-install"
-    "helm.sh/hook-weight": "-5"
+#    "helm.sh/hook": "post-install"
+#    "helm.sh/hook-weight": "-5"
 #    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   serviceAccountName: tsb-operator-management-plane

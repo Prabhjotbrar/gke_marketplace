@@ -13,7 +13,7 @@ REGISTRY := gcr.io/gke-istio-test-psb/tsb-operator
 
 $(info ---- REGISTRY = $(REGISTRY))
 
-CHART_NAME := tsb-operator
+CHART_NAME := tsbcp
 $(info ---- CHART_NAME = $(CHART_NAME))
 
 OPERATOR_TAG ?= 1.3.0

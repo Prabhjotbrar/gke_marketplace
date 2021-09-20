@@ -3,9 +3,9 @@ kind: Pod
 metadata:
   name: posthook
   namespace: elastic
-  annotations:
-    "helm.sh/hook": "post-install"
-    "helm.sh/hook-weight": "-5"
+  # annotations:
+  #   "helm.sh/hook": "post-install"
+  #   "helm.sh/hook-weight": "-5"
 #    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   serviceAccountName: elastic
